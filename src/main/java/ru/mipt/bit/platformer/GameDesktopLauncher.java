@@ -8,36 +8,48 @@ import com.badlogic.gdx.math.GridPoint2;
 import ru.mipt.bit.platformer.controller.Controller;
 import ru.mipt.bit.platformer.controller.KeyboardTankController;
 import ru.mipt.bit.platformer.model.CollisionDetector;
+import ru.mipt.bit.platformer.model.Obstacle;
 import ru.mipt.bit.platformer.model.ObstacleCollisionDetector;
 import ru.mipt.bit.platformer.model.Tank;
 import ru.mipt.bit.platformer.model.Tree;
 import ru.mipt.bit.platformer.renderer.GameRenderer;
+import ru.mipt.bit.platformer.renderer.Renderer;
 
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GameDesktopLauncher implements ApplicationListener {
     private static final float MOVEMENT_SPEED = 0.4f;
+    private static final String TANK_TEXTURE = "images/tank_blue.png";
+    private static final String TREE_TEXTURE = "images/greenTree.png";
 
-    private GameRenderer renderer;
+    private Renderer renderer;
     private Tank tank;
     private Controller tankController;
 
     @Override
     public void create() {
-        Tree tree = new Tree(new GridPoint2(1, 3));
-        CollisionDetector collisions = new ObstacleCollisionDetector(Collections.singletonList(tree));
+        List<Obstacle> obstacles = new ArrayList<Obstacle>();
+        obstacles.add(new Tree(new GridPoint2(1, 3)));
 
-        tank = new Tank(new GridPoint2(1, 1), MOVEMENT_SPEED);
-        tankController = new KeyboardTankController(tank, collisions);
-        renderer = new GameRenderer(Collections.singletonList(tree));
+        CollisionDetector collisions = new ObstacleCollisionDetector(obstacles);
+        tank = new Tank(new GridPoint2(1, 1), MOVEMENT_SPEED, collisions);
+        tankController = new KeyboardTankController(tank, Gdx.input);
+
+        GameRenderer gameRenderer = new GameRenderer();
+        gameRenderer.register(tank, TANK_TEXTURE);
+        for (Obstacle obstacle : obstacles) {
+            gameRenderer.register(obstacle, TREE_TEXTURE);
+        }
+        renderer = gameRenderer;
     }
 
     @Override
     public void render() {
         float deltaTime = Gdx.graphics.getDeltaTime();
         tankController.update();
+        renderer.render();
         tank.update(deltaTime);
-        renderer.render(tank);
     }
 
     @Override

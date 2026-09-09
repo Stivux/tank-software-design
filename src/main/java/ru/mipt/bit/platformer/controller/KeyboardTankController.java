@@ -1,7 +1,6 @@
 package ru.mipt.bit.platformer.controller;
 
-import com.badlogic.gdx.Gdx;
-import ru.mipt.bit.platformer.model.CollisionDetector;
+import com.badlogic.gdx.Input;
 import ru.mipt.bit.platformer.model.Direction;
 import ru.mipt.bit.platformer.model.Tank;
 
@@ -12,12 +11,12 @@ import static com.badlogic.gdx.Input.Keys.*;
 
 public class KeyboardTankController implements Controller {
     private final Tank tank;
-    private final CollisionDetector collisionDetector;
+    private final Input input;
     private final Map<Direction, int[]> keyBindings;
 
-    public KeyboardTankController(Tank tank, CollisionDetector collisionDetector) {
+    public KeyboardTankController(Tank tank, Input input) {
         this.tank = tank;
-        this.collisionDetector = collisionDetector;
+        this.input = input;
         this.keyBindings = createDefaultKeyBindings();
     }
 
@@ -25,14 +24,14 @@ public class KeyboardTankController implements Controller {
     public void update() {
         for (Map.Entry<Direction, int[]> binding : keyBindings.entrySet()) {
             if (isAnyKeyPressed(binding.getValue())) {
-                tank.tryMove(binding.getKey(), collisionDetector);
+                tank.tryMove(binding.getKey());
             }
         }
     }
 
     private boolean isAnyKeyPressed(int[] keys) {
         for (int key : keys) {
-            if (Gdx.input.isKeyPressed(key)) {
+            if (input.isKeyPressed(key)) {
                 return true;
             }
         }

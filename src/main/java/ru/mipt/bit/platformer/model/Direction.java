@@ -18,11 +18,11 @@ public enum Direction {
         this.rotation = rotation;
     }
 
-    public GridPoint2 nextPosition(GridPoint2 from) {
-        return new GridPoint2(from).add(deltaX, deltaY);
+    public GridPoint2 addDirectionDelta(GridPoint2 source) {
+        return new GridPoint2(source).add(deltaX, deltaY);
     }
 
-    public float getRotation() {
+    float rotation() {
         return rotation;
     }
 }
