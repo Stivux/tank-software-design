@@ -9,21 +9,20 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.utils.Disposable;
+import ru.mipt.bit.platformer.model.Movable;
 import ru.mipt.bit.platformer.model.Obstacle;
-import ru.mipt.bit.platformer.model.Tank;
 import ru.mipt.bit.platformer.util.TileMovement;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.createSingleLayerMapRenderer;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.getSingleLayer;
-import static ru.mipt.bit.platformer.util.GdxGameUtils.moveRectangleAtTileCenter;
 
-public class GameRenderer implements Disposable {
+public class GameRenderer implements Renderer {
     private static final float BACKGROUND_RED = 0f;
     private static final float BACKGROUND_GREEN = 0f;
     private static final float BACKGROUND_BLUE = 0.2f;
@@ -32,56 +31,62 @@ public class GameRenderer implements Disposable {
     private final Batch batch;
     private final TiledMap level;
     private final MapRenderer levelRenderer;
+    private final TiledMapTileLayer groundLayer;
     private final TileMovement tileMovement;
-    private final Texture tankTexture;
-    private final Texture treeTexture;
-    private final GraphicObject tankGraphics;
-    private final List<GraphicObject> obstacleGraphics = new ArrayList<GraphicObject>();
+    private final Map<String, Texture> textures = new HashMap<String, Texture>();
+    private final List<EntityGraphic> movableGraphics = new ArrayList<EntityGraphic>();
+    private final List<EntityGraphic> obstacleGraphics = new ArrayList<EntityGraphic>();
 
-    public GameRenderer(Collection<? extends Obstacle> obstacles) {
+    public GameRenderer() {
         batch = new SpriteBatch();
         level = new TmxMapLoader().load("level.tmx");
         levelRenderer = createSingleLayerMapRenderer(level, batch);
-        TiledMapTileLayer groundLayer = getSingleLayer(level);
+        groundLayer = getSingleLayer(level);
         tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
-
-        tankTexture = new Texture("images/tank_blue.png");
-        treeTexture = new Texture("images/greenTree.png");
-        tankGraphics = new GraphicObject(tankTexture);
-
-        for (Obstacle obstacle : obstacles) {
-            GraphicObject graphics = new GraphicObject(treeTexture);
-            moveRectangleAtTileCenter(groundLayer, graphics.getRectangle(), obstacle.getCoordinates());
-            obstacleGraphics.add(graphics);
-        }
     }
 
-    public void render(Tank tank) {
+    public void register(Movable movable, String texturePath) {
+        movableGraphics.add(new MovableGraphic(movable, new GraphicObject(texture(texturePath)), tileMovement));
+    }
+
+    public void register(Obstacle obstacle, String texturePath) {
+        obstacleGraphics.add(new ObstacleGraphic(obstacle, new GraphicObject(texture(texturePath)), groundLayer));
+    }
+
+    @Override
+    public void render() {
         Gdx.gl.glClearColor(BACKGROUND_RED, BACKGROUND_GREEN, BACKGROUND_BLUE, BACKGROUND_ALPHA);
         Gdx.gl.glClear(GL_COLOR_BUFFER_BIT);
-
-        tileMovement.moveRectangleBetweenTileCenters(
-                tankGraphics.getRectangle(),
-                tank.getCoordinates(),
-                tank.getDestinationCoordinates(),
-                tank.getMovementProgress()
-        );
 
         levelRenderer.render();
 
         batch.begin();
-        tankGraphics.draw(batch, tank.getRotation());
-        for (GraphicObject graphics : obstacleGraphics) {
-            graphics.draw(batch, 0f);
-        }
+        draw(movableGraphics);
+        draw(obstacleGraphics);
         batch.end();
     }
 
     @Override
     public void dispose() {
-        treeTexture.dispose();
-        tankTexture.dispose();
+        for (Texture texture : textures.values()) {
+            texture.dispose();
+        }
         level.dispose();
         batch.dispose();
+    }
+
+    private void draw(List<EntityGraphic> graphics) {
+        for (EntityGraphic graphic : graphics) {
+            graphic.draw(batch);
+        }
+    }
+
+    private Texture texture(String path) {
+        Texture texture = textures.get(path);
+        if (texture == null) {
+            texture = new Texture(path);
+            textures.put(path, texture);
+        }
+        return texture;
     }
 }
