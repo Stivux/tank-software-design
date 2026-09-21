@@ -34,8 +34,8 @@ public class GameRenderer implements Renderer {
     private final TiledMapTileLayer groundLayer;
     private final TileMovement tileMovement;
     private final Map<String, Texture> textures = new HashMap<String, Texture>();
-    private final List<MovableView> movableViews = new ArrayList<MovableView>();
-    private final List<GraphicObject> staticGraphics = new ArrayList<GraphicObject>();
+    private final List<EntityGraphic> movableGraphics = new ArrayList<EntityGraphic>();
+    private final List<EntityGraphic> obstacleGraphics = new ArrayList<EntityGraphic>();
 
     public GameRenderer() {
         batch = new SpriteBatch();
@@ -46,13 +46,11 @@ public class GameRenderer implements Renderer {
     }
 
     public void register(Movable movable, String texturePath) {
-        movableViews.add(new MovableView(movable, new GraphicObject(texture(texturePath))));
+        movableGraphics.add(new MovableGraphic(movable, new GraphicObject(texture(texturePath)), tileMovement));
     }
 
     public void register(Obstacle obstacle, String texturePath) {
-        GraphicObject graphics = new GraphicObject(texture(texturePath));
-        graphics.placeAtTile(groundLayer, obstacle.getCoordinates());
-        staticGraphics.add(graphics);
+        obstacleGraphics.add(new ObstacleGraphic(obstacle, new GraphicObject(texture(texturePath)), groundLayer));
     }
 
     @Override
@@ -60,25 +58,11 @@ public class GameRenderer implements Renderer {
         Gdx.gl.glClearColor(BACKGROUND_RED, BACKGROUND_GREEN, BACKGROUND_BLUE, BACKGROUND_ALPHA);
         Gdx.gl.glClear(GL_COLOR_BUFFER_BIT);
 
-        for (MovableView view : movableViews) {
-            Movable movable = view.movable;
-            view.graphics.interpolate(
-                    tileMovement,
-                    movable.getCoordinates(),
-                    movable.getDestinationCoordinates(),
-                    movable.getMovementProgress()
-            );
-        }
-
         levelRenderer.render();
 
         batch.begin();
-        for (MovableView view : movableViews) {
-            view.graphics.draw(batch, view.movable.getRotation());
-        }
-        for (GraphicObject graphics : staticGraphics) {
-            graphics.draw(batch, 0f);
-        }
+        draw(movableGraphics);
+        draw(obstacleGraphics);
         batch.end();
     }
 
@@ -91,6 +75,12 @@ public class GameRenderer implements Renderer {
         batch.dispose();
     }
 
+    private void draw(List<EntityGraphic> graphics) {
+        for (EntityGraphic graphic : graphics) {
+            graphic.draw(batch);
+        }
+    }
+
     private Texture texture(String path) {
         Texture texture = textures.get(path);
         if (texture == null) {
@@ -98,15 +88,5 @@ public class GameRenderer implements Renderer {
             textures.put(path, texture);
         }
         return texture;
-    }
-
-    private static class MovableView {
-        final Movable movable;
-        final GraphicObject graphics;
-
-        MovableView(Movable movable, GraphicObject graphics) {
-            this.movable = movable;
-            this.graphics = graphics;
-        }
     }
 }

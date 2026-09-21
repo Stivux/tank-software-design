@@ -6,7 +6,9 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.math.GridPoint2;
 import ru.mipt.bit.platformer.controller.Controller;
-import ru.mipt.bit.platformer.controller.KeyboardTankController;
+import ru.mipt.bit.platformer.controller.GdxKeyInput;
+import ru.mipt.bit.platformer.controller.KeyboardHandler;
+import ru.mipt.bit.platformer.controller.TankControls;
 import ru.mipt.bit.platformer.model.CollisionDetector;
 import ru.mipt.bit.platformer.model.Obstacle;
 import ru.mipt.bit.platformer.model.ObstacleCollisionDetector;
@@ -25,7 +27,7 @@ public class GameDesktopLauncher implements ApplicationListener {
 
     private Renderer renderer;
     private Tank tank;
-    private Controller tankController;
+    private Controller controller;
 
     @Override
     public void create() {
@@ -34,7 +36,9 @@ public class GameDesktopLauncher implements ApplicationListener {
 
         CollisionDetector collisions = new ObstacleCollisionDetector(obstacles);
         tank = new Tank(new GridPoint2(1, 1), MOVEMENT_SPEED, collisions);
-        tankController = new KeyboardTankController(tank, Gdx.input);
+        KeyboardHandler keyboard = new KeyboardHandler(new GdxKeyInput(Gdx.input));
+        TankControls.bindMovement(keyboard, tank);
+        controller = keyboard;
 
         GameRenderer gameRenderer = new GameRenderer();
         gameRenderer.register(tank, TANK_TEXTURE);
@@ -47,7 +51,7 @@ public class GameDesktopLauncher implements ApplicationListener {
     @Override
     public void render() {
         float deltaTime = Gdx.graphics.getDeltaTime();
-        tankController.update();
+        controller.update();
         renderer.render();
         tank.update(deltaTime);
     }
