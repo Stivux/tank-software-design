@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.mipt.bit.platformer.model.CollisionDetector;
 import ru.mipt.bit.platformer.model.Direction;
-import ru.mipt.bit.platformer.model.Obstacle;
+import ru.mipt.bit.platformer.model.GameObject;
 import ru.mipt.bit.platformer.model.ObstacleCollisionDetector;
 import ru.mipt.bit.platformer.model.Tank;
 import ru.mipt.bit.platformer.model.Tree;
@@ -103,7 +103,7 @@ class TankControlsTest {
 
     @Test
     void laterFreeDirectionAppliesWhenTheEarlierOneIsBlocked() {
-        List<Obstacle> obstacles = new ArrayList<Obstacle>();
+        List<GameObject> obstacles = new ArrayList<GameObject>();
         obstacles.add(new Tree(new GridPoint2(1, 2)));
         tank = new Tank(new GridPoint2(1, 1), 1f, new ObstacleCollisionDetector(obstacles));
         keyboard = new KeyboardHandler(input);

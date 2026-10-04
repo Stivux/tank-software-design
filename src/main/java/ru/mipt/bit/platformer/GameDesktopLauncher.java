@@ -10,11 +10,14 @@ import ru.mipt.bit.platformer.controller.GdxKeyInput;
 import ru.mipt.bit.platformer.controller.KeyboardHandler;
 import ru.mipt.bit.platformer.controller.TankControls;
 import ru.mipt.bit.platformer.model.CollisionDetector;
-import ru.mipt.bit.platformer.model.Obstacle;
+import ru.mipt.bit.platformer.model.GameObject;
 import ru.mipt.bit.platformer.model.ObstacleCollisionDetector;
 import ru.mipt.bit.platformer.model.Tank;
 import ru.mipt.bit.platformer.model.Tree;
+import ru.mipt.bit.platformer.model.Updatable;
 import ru.mipt.bit.platformer.renderer.GameRenderer;
+import ru.mipt.bit.platformer.renderer.MovableGraphic;
+import ru.mipt.bit.platformer.renderer.ObstacleGraphic;
 import ru.mipt.bit.platformer.renderer.Renderer;
 
 import java.util.ArrayList;
@@ -22,38 +25,43 @@ import java.util.List;
 
 public class GameDesktopLauncher implements ApplicationListener {
     private static final float MOVEMENT_SPEED = 0.4f;
+    private static final String LEVEL_PATH = "level.tmx";
     private static final String TANK_TEXTURE = "images/tank_blue.png";
     private static final String TREE_TEXTURE = "images/greenTree.png";
 
     private Renderer renderer;
-    private Tank tank;
-    private Controller controller;
+    private final List<Controller> controllers = new ArrayList<Controller>();
+    private final List<Updatable> updatables = new ArrayList<Updatable>();
 
     @Override
     public void create() {
-        List<Obstacle> obstacles = new ArrayList<Obstacle>();
-        obstacles.add(new Tree(new GridPoint2(1, 3)));
+        Tree tree = new Tree(new GridPoint2(1, 3));
+        List<GameObject> obstacles = new ArrayList<GameObject>();
+        obstacles.add(tree);
 
         CollisionDetector collisions = new ObstacleCollisionDetector(obstacles);
-        tank = new Tank(new GridPoint2(1, 1), MOVEMENT_SPEED, collisions);
+        Tank tank = new Tank(new GridPoint2(1, 1), MOVEMENT_SPEED, collisions);
         KeyboardHandler keyboard = new KeyboardHandler(new GdxKeyInput(Gdx.input));
         TankControls.bindMovement(keyboard, tank);
-        controller = keyboard;
+        controllers.add(keyboard);
+        updatables.add(tank);
 
-        GameRenderer gameRenderer = new GameRenderer();
-        gameRenderer.register(tank, TANK_TEXTURE);
-        for (Obstacle obstacle : obstacles) {
-            gameRenderer.register(obstacle, TREE_TEXTURE);
-        }
+        GameRenderer gameRenderer = new GameRenderer(LEVEL_PATH);
+        gameRenderer.add(new MovableGraphic(tank, gameRenderer.createGraphic(TANK_TEXTURE), gameRenderer.getTileMovement()));
+        gameRenderer.add(new ObstacleGraphic(tree, gameRenderer.createGraphic(TREE_TEXTURE), gameRenderer.getGroundLayer()));
         renderer = gameRenderer;
     }
 
     @Override
     public void render() {
         float deltaTime = Gdx.graphics.getDeltaTime();
-        controller.update();
+        for (Controller controller : controllers) {
+            controller.update();
+        }
         renderer.render();
-        tank.update(deltaTime);
+        for (Updatable updatable : updatables) {
+            updatable.update(deltaTime);
+        }
     }
 
     @Override

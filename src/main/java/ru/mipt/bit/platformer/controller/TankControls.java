@@ -1,7 +1,7 @@
 package ru.mipt.bit.platformer.controller;
 
 import ru.mipt.bit.platformer.model.Direction;
-import ru.mipt.bit.platformer.model.Tank;
+import ru.mipt.bit.platformer.model.Movable;
 
 import static com.badlogic.gdx.Input.Keys.A;
 import static com.badlogic.gdx.Input.Keys.D;
@@ -16,10 +16,10 @@ public final class TankControls {
     private TankControls() {
     }
 
-    public static void bindMovement(KeyboardHandler keyboard, Tank tank) {
-        keyboard.addHandler(new MoveTankAction(tank, Direction.UP), UP, W);
-        keyboard.addHandler(new MoveTankAction(tank, Direction.LEFT), LEFT, A);
-        keyboard.addHandler(new MoveTankAction(tank, Direction.DOWN), DOWN, S);
-        keyboard.addHandler(new MoveTankAction(tank, Direction.RIGHT), RIGHT, D);
+    public static void bindMovement(KeyBindings bindings, Movable tank) {
+        bindings.addHandler(new MoveTankAction(tank, Direction.UP), UP, W);
+        bindings.addHandler(new MoveTankAction(tank, Direction.LEFT), LEFT, A);
+        bindings.addHandler(new MoveTankAction(tank, Direction.DOWN), DOWN, S);
+        bindings.addHandler(new MoveTankAction(tank, Direction.RIGHT), RIGHT, D);
     }
 }

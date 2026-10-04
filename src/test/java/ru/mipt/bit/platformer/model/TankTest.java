@@ -96,7 +96,7 @@ class TankTest {
 
     @Test
     void doesNotEnterAnObstacleCell() {
-        List<Obstacle> obstacles = new ArrayList<Obstacle>();
+        List<GameObject> obstacles = new ArrayList<GameObject>();
         obstacles.add(new Tree(new GridPoint2(1, 2)));
         tank = new Tank(new GridPoint2(1, 1), SPEED, new ObstacleCollisionDetector(obstacles));
 

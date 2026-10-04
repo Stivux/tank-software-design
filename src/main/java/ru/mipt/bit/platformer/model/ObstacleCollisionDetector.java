@@ -5,16 +5,16 @@ import com.badlogic.gdx.math.GridPoint2;
 import java.util.Collection;
 
 public class ObstacleCollisionDetector implements CollisionDetector {
-    private final Collection<? extends Obstacle> obstacles;
+    private final Collection<? extends GameObject> objects;
 
-    public ObstacleCollisionDetector(Collection<? extends Obstacle> obstacles) {
-        this.obstacles = obstacles;
+    public ObstacleCollisionDetector(Collection<? extends GameObject> objects) {
+        this.objects = objects;
     }
 
     @Override
     public boolean isOccupied(GridPoint2 position) {
-        for (Obstacle obstacle : obstacles) {
-            if (obstacle.getCoordinates().equals(position)) {
+        for (GameObject object : objects) {
+            if (object.getCoordinates().equals(position)) {
                 return true;
             }
         }

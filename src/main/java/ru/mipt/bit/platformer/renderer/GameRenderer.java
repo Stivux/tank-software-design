@@ -9,8 +9,6 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Interpolation;
-import ru.mipt.bit.platformer.model.Movable;
-import ru.mipt.bit.platformer.model.Obstacle;
 import ru.mipt.bit.platformer.util.TileMovement;
 
 import java.util.ArrayList;
@@ -34,23 +32,30 @@ public class GameRenderer implements Renderer {
     private final TiledMapTileLayer groundLayer;
     private final TileMovement tileMovement;
     private final Map<String, Texture> textures = new HashMap<String, Texture>();
-    private final List<EntityGraphic> movableGraphics = new ArrayList<EntityGraphic>();
-    private final List<EntityGraphic> obstacleGraphics = new ArrayList<EntityGraphic>();
+    private final List<EntityGraphic> graphics = new ArrayList<EntityGraphic>();
 
-    public GameRenderer() {
+    public GameRenderer(String levelPath) {
         batch = new SpriteBatch();
-        level = new TmxMapLoader().load("level.tmx");
+        level = new TmxMapLoader().load(levelPath);
         levelRenderer = createSingleLayerMapRenderer(level, batch);
         groundLayer = getSingleLayer(level);
         tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
     }
 
-    public void register(Movable movable, String texturePath) {
-        movableGraphics.add(new MovableGraphic(movable, new GraphicObject(texture(texturePath)), tileMovement));
+    public void add(EntityGraphic graphic) {
+        graphics.add(graphic);
     }
 
-    public void register(Obstacle obstacle, String texturePath) {
-        obstacleGraphics.add(new ObstacleGraphic(obstacle, new GraphicObject(texture(texturePath)), groundLayer));
+    public GraphicObject createGraphic(String texturePath) {
+        return new GraphicObject(texture(texturePath));
+    }
+
+    public TileMovement getTileMovement() {
+        return tileMovement;
+    }
+
+    public TiledMapTileLayer getGroundLayer() {
+        return groundLayer;
     }
 
     @Override
@@ -61,8 +66,9 @@ public class GameRenderer implements Renderer {
         levelRenderer.render();
 
         batch.begin();
-        draw(movableGraphics);
-        draw(obstacleGraphics);
+        for (EntityGraphic graphic : graphics) {
+            graphic.draw(batch);
+        }
         batch.end();
     }
 
@@ -73,12 +79,6 @@ public class GameRenderer implements Renderer {
         }
         level.dispose();
         batch.dispose();
-    }
-
-    private void draw(List<EntityGraphic> graphics) {
-        for (EntityGraphic graphic : graphics) {
-            graphic.draw(batch);
-        }
     }
 
     private Texture texture(String path) {
