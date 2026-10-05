@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.GridPoint2;
 
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 
-public class Tank implements Movable {
+public class Tank implements Movable, Updatable {
     private final GridPoint2 coordinates;
     private final GridPoint2 destinationCoordinates;
     private final float movementSpeed;
@@ -20,6 +20,7 @@ public class Tank implements Movable {
         this.rotation = 0f;
     }
 
+    @Override
     public void tryMove(Direction direction) {
         if (!hasReachedDestination()) {
             return;
@@ -32,6 +33,7 @@ public class Tank implements Movable {
         rotation = direction.getRotation();
     }
 
+    @Override
     public void update(float deltaTime) {
         movementProgress = advanceProgress(movementProgress, deltaTime, movementSpeed);
         if (hasReachedDestination()) {
