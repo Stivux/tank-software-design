@@ -1,16 +1,23 @@
 package ru.mipt.bit.platformer;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.GridPoint2;
+import ru.mipt.bit.platformer.controller.AiTankController;
 import ru.mipt.bit.platformer.controller.Controller;
 import ru.mipt.bit.platformer.controller.GdxKeyInput;
 import ru.mipt.bit.platformer.controller.KeyboardHandler;
+import ru.mipt.bit.platformer.controller.MoveStrategy;
+import ru.mipt.bit.platformer.controller.RandomMoveStrategy;
 import ru.mipt.bit.platformer.controller.TankControls;
 import ru.mipt.bit.platformer.level.Level;
 import ru.mipt.bit.platformer.level.LevelGenerator;
 import ru.mipt.bit.platformer.level.RandomLevelGenerator;
+import ru.mipt.bit.platformer.level.RandomTankGenerator;
 import ru.mipt.bit.platformer.level.TextLevelGenerator;
 import ru.mipt.bit.platformer.model.CollisionDetector;
 import ru.mipt.bit.platformer.model.GameObject;
+import ru.mipt.bit.platformer.model.Movable;
+import ru.mipt.bit.platformer.model.MovementCollisionDetector;
 import ru.mipt.bit.platformer.model.ObstacleCollisionDetector;
 import ru.mipt.bit.platformer.model.Tank;
 import ru.mipt.bit.platformer.model.Updatable;
@@ -33,6 +40,7 @@ public final class GameSetup {
 
     private static final float MOVEMENT_SPEED = 0.4f;
     private static final int RANDOM_TREE_COUNT = 10;
+    private static final int AI_TANK_COUNT = 4;
     private static final boolean USE_FILE_LEVEL = true;
     private static final String LEVEL_MAP = "level.tmx";
     private static final String LEVEL_GRID = "level.txt";
@@ -44,18 +52,36 @@ public final class GameSetup {
 
     public static GameLoop create() {
         Level level = createLevelGenerator().generate();
-        CollisionDetector collisions = new ObstacleCollisionDetector(level.getObstacles());
-        Tank tank = new Tank(level.getPlayerStart(), MOVEMENT_SPEED, collisions);
+        List<Movable> tanks = new ArrayList<Movable>();
+        CollisionDetector collisions = new MovementCollisionDetector(
+                level.getWidth(),
+                level.getHeight(),
+                new ObstacleCollisionDetector(level.getObstacles()),
+                tanks);
+        Random random = new Random();
+
+        Tank player = new Tank(level.getPlayerStart(), MOVEMENT_SPEED, collisions);
+        tanks.add(player);
         KeyboardHandler keyboard = new KeyboardHandler(new GdxKeyInput(Gdx.input));
-        TankControls.bindMovement(keyboard, tank);
+        TankControls.bindMovement(keyboard, player);
 
         List<Controller> controllers = new ArrayList<Controller>();
         controllers.add(keyboard);
         List<Updatable> updatables = new ArrayList<Updatable>();
-        updatables.add(tank);
+        updatables.add(player);
+
+        MoveStrategy aiMoves = new RandomMoveStrategy(random);
+        for (GridPoint2 start : new RandomTankGenerator(AI_TANK_COUNT, random).generate(level)) {
+            Tank ai = new Tank(start, MOVEMENT_SPEED, collisions);
+            tanks.add(ai);
+            updatables.add(ai);
+            controllers.add(new AiTankController(ai, aiMoves));
+        }
 
         GameRenderer gameRenderer = new GameRenderer(LEVEL_MAP);
-        gameRenderer.add(new MovableGraphic(tank, gameRenderer.createGraphic(TANK_TEXTURE), gameRenderer.getTileMovement()));
+        for (Movable tank : tanks) {
+            gameRenderer.add(new MovableGraphic(tank, gameRenderer.createGraphic(TANK_TEXTURE), gameRenderer.getTileMovement()));
+        }
         for (GameObject obstacle : level.getObstacles()) {
             gameRenderer.add(new ObstacleGraphic(obstacle, gameRenderer.createGraphic(TREE_TEXTURE), gameRenderer.getGroundLayer()));
         }

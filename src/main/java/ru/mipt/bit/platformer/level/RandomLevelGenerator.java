@@ -42,6 +42,6 @@ public final class RandomLevelGenerator implements LevelGenerator {
         for (int i = 0; i < obstacleCount; i++) {
             obstacles.add(new Tree(cells.get(i)));
         }
-        return new Level(cells.get(obstacleCount), obstacles);
+        return new Level(width, height, cells.get(obstacleCount), obstacles);
     }
 }

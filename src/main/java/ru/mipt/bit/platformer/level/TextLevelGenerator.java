@@ -53,7 +53,7 @@ public final class TextLevelGenerator implements LevelGenerator {
         if (playerStart == null) {
             throw new IllegalArgumentException("Level must contain exactly one player start");
         }
-        return new Level(playerStart, obstacles);
+        return new Level(width, height, playerStart, obstacles);
     }
 
     private static List<String> trimTrailingEmptyRows(List<String> rows) {

@@ -18,6 +18,8 @@ class RandomLevelGeneratorTest {
     void placesUniqueTreesAndAFreePlayer() {
         Level level = new RandomLevelGenerator(4, 3, 5, new Random(1L)).generate();
 
+        assertEquals(4, level.getWidth());
+        assertEquals(3, level.getHeight());
         assertEquals(5, level.getObstacles().size());
         Set<GridPoint2> occupied = new HashSet<GridPoint2>();
         for (GameObject obstacle : level.getObstacles()) {

@@ -23,6 +23,8 @@ class FileLevelGeneratorTest {
                 "TTTT___T_T",
                 "__________")).generate();
 
+        assertEquals(10, level.getWidth());
+        assertEquals(4, level.getHeight());
         assertEquals(new GridPoint2(5, 2), level.getPlayerStart());
         assertEquals(Set.of(
                 cell(2, 3), cell(3, 3), cell(5, 3), cell(7, 3), cell(8, 3), cell(9, 3),
