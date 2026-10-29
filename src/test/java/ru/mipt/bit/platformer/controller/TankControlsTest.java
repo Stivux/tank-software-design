@@ -3,6 +3,8 @@ package ru.mipt.bit.platformer.controller;
 import com.badlogic.gdx.math.GridPoint2;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.mipt.bit.platformer.level.Level;
+import ru.mipt.bit.platformer.model.Bullet;
 import ru.mipt.bit.platformer.model.CollisionDetector;
 import ru.mipt.bit.platformer.model.Direction;
 import ru.mipt.bit.platformer.model.GameObject;
@@ -11,6 +13,7 @@ import ru.mipt.bit.platformer.model.Tank;
 import ru.mipt.bit.platformer.model.Tree;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.badlogic.gdx.Input.Keys.A;
@@ -79,6 +82,26 @@ class TankControlsTest {
         arrive();
         pressAndUpdate(RIGHT);
         assertEquals(Direction.RIGHT.getRotation(), tank.getRotation(), 0f);
+    }
+
+    @Test
+    void spaceSpawnsABulletAheadOfTheTank() {
+        Level level = new Level(5, 5, new GridPoint2(1, 1), Collections.<GameObject>emptyList());
+        Tank shooter = new Tank(new GridPoint2(1, 1), 1f, free(), level);
+        KeyboardHandler keys = new KeyboardHandler(input);
+        TankControls.bindShooting(keys, shooter);
+
+        input.press(SPACE);
+        keys.update();
+
+        List<Bullet> bullets = new ArrayList<Bullet>();
+        for (GameObject object : level.getObjects()) {
+            if (object instanceof Bullet) {
+                bullets.add((Bullet) object);
+            }
+        }
+        assertEquals(1, bullets.size());
+        assertEquals(new GridPoint2(2, 1), bullets.get(0).getCoordinates());
     }
 
     @Test

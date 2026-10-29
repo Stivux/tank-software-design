@@ -2,10 +2,16 @@ package ru.mipt.bit.platformer.controller;
 
 import com.badlogic.gdx.math.GridPoint2;
 import org.junit.jupiter.api.Test;
+import ru.mipt.bit.platformer.level.Level;
+import ru.mipt.bit.platformer.model.Bullet;
 import ru.mipt.bit.platformer.model.CollisionDetector;
 import ru.mipt.bit.platformer.model.Direction;
+import ru.mipt.bit.platformer.model.GameObject;
 import ru.mipt.bit.platformer.model.Tank;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,6 +42,26 @@ class AiTankControllerTest {
         assertEquals(new GridPoint2(2, 1), tank.getCoordinates());
         assertEquals(new GridPoint2(2, 2), tank.getDestinationCoordinates());
         assertEquals(0f, tank.getMovementProgress(), 0f);
+    }
+
+    @Test
+    void sometimesShootsInsteadOfMoving() {
+        Level level = new Level(5, 5, new GridPoint2(0, 0), Collections.<GameObject>emptyList());
+        Tank tank = new Tank(new GridPoint2(1, 1), 1f, free(), level);
+        level.add(tank);
+
+        new AiTankController(tank, new ScriptedRandom(Direction.values().length)).update();
+
+        assertEquals(1f, tank.getMovementProgress(), 0f);
+        assertEquals(new GridPoint2(1, 1), tank.getDestinationCoordinates());
+        List<Bullet> bullets = new ArrayList<Bullet>();
+        for (GameObject object : level.getObjects()) {
+            if (object instanceof Bullet) {
+                bullets.add((Bullet) object);
+            }
+        }
+        assertEquals(1, bullets.size());
+        assertEquals(new GridPoint2(2, 1), bullets.get(0).getCoordinates());
     }
 
     @Test

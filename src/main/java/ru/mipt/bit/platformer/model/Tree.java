@@ -13,4 +13,9 @@ public class Tree implements GameObject {
     public GridPoint2 getCoordinates() {
         return coordinates;
     }
+
+    @Override
+    public boolean blocksMovement() {
+        return true;
+    }
 }

@@ -14,14 +14,11 @@ import ru.mipt.bit.platformer.level.RandomTankGenerator;
 import ru.mipt.bit.platformer.level.TextLevelGenerator;
 import ru.mipt.bit.platformer.model.CollisionDetector;
 import ru.mipt.bit.platformer.model.GameObject;
-import ru.mipt.bit.platformer.model.Movable;
 import ru.mipt.bit.platformer.model.MovementCollisionDetector;
 import ru.mipt.bit.platformer.model.ObstacleCollisionDetector;
 import ru.mipt.bit.platformer.model.Tank;
 import ru.mipt.bit.platformer.model.Updatable;
 import ru.mipt.bit.platformer.renderer.GameRenderer;
-import ru.mipt.bit.platformer.renderer.MovableGraphic;
-import ru.mipt.bit.platformer.renderer.ObstacleGraphic;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,46 +39,46 @@ public final class GameSetup {
     private static final boolean USE_FILE_LEVEL = true;
     private static final String LEVEL_MAP = "level.tmx";
     private static final String LEVEL_GRID = "level.txt";
-    private static final String TANK_TEXTURE = "images/tank_blue.png";
-    private static final String TREE_TEXTURE = "images/greenTree.png";
 
     private GameSetup() {
     }
 
     public static GameLoop create() {
         Level level = createLevelGenerator().generate();
-        List<Movable> tanks = new ArrayList<Movable>();
         CollisionDetector collisions = new MovementCollisionDetector(
                 level.getWidth(),
                 level.getHeight(),
                 new ObstacleCollisionDetector(level.getObstacles()),
-                tanks);
+                level.getObjects());
         Random random = new Random();
 
-        Tank player = new Tank(level.getPlayerStart(), MOVEMENT_SPEED, collisions);
-        tanks.add(player);
+        Tank player = new Tank(level.getPlayerStart(), MOVEMENT_SPEED, collisions, level);
         KeyboardHandler keyboard = new KeyboardHandler(new GdxKeyInput(Gdx.input));
         TankControls.bindMovement(keyboard, player);
+        TankControls.bindShooting(keyboard, player);
 
         List<Controller> controllers = new ArrayList<Controller>();
         controllers.add(keyboard);
-        List<Updatable> updatables = new ArrayList<Updatable>();
-        updatables.add(player);
-
-        for (GridPoint2 start : new RandomTankGenerator(AI_TANK_COUNT, random).generate(level)) {
-            Tank ai = new Tank(start, MOVEMENT_SPEED, collisions);
-            tanks.add(ai);
-            updatables.add(ai);
+        List<GridPoint2> aiStarts = new RandomTankGenerator(AI_TANK_COUNT, random).generate(level);
+        List<Tank> aiTanks = new ArrayList<Tank>();
+        for (GridPoint2 start : aiStarts) {
+            Tank ai = new Tank(start, MOVEMENT_SPEED, collisions, level);
+            aiTanks.add(ai);
             controllers.add(new AiTankController(ai, random));
         }
 
         GameRenderer gameRenderer = new GameRenderer(LEVEL_MAP);
-        for (Movable tank : tanks) {
-            gameRenderer.add(new MovableGraphic(tank, gameRenderer.createGraphic(TANK_TEXTURE), gameRenderer.getTileMovement()));
-        }
+        level.addListener(gameRenderer);
         for (GameObject obstacle : level.getObstacles()) {
-            gameRenderer.add(new ObstacleGraphic(obstacle, gameRenderer.createGraphic(TREE_TEXTURE), gameRenderer.getGroundLayer()));
+            level.add(obstacle);
         }
+        level.add(player);
+        for (Tank ai : aiTanks) {
+            level.add(ai);
+        }
+
+        List<Updatable> updatables = new ArrayList<Updatable>();
+        updatables.add(level);
         return new GameLoop(gameRenderer, controllers, updatables);
     }
 
