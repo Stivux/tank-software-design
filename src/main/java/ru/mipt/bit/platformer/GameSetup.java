@@ -6,8 +6,6 @@ import ru.mipt.bit.platformer.controller.AiTankController;
 import ru.mipt.bit.platformer.controller.Controller;
 import ru.mipt.bit.platformer.controller.GdxKeyInput;
 import ru.mipt.bit.platformer.controller.KeyboardHandler;
-import ru.mipt.bit.platformer.controller.MoveStrategy;
-import ru.mipt.bit.platformer.controller.RandomMoveStrategy;
 import ru.mipt.bit.platformer.controller.TankControls;
 import ru.mipt.bit.platformer.level.Level;
 import ru.mipt.bit.platformer.level.LevelGenerator;
@@ -70,12 +68,11 @@ public final class GameSetup {
         List<Updatable> updatables = new ArrayList<Updatable>();
         updatables.add(player);
 
-        MoveStrategy aiMoves = new RandomMoveStrategy(random);
         for (GridPoint2 start : new RandomTankGenerator(AI_TANK_COUNT, random).generate(level)) {
             Tank ai = new Tank(start, MOVEMENT_SPEED, collisions);
             tanks.add(ai);
             updatables.add(ai);
-            controllers.add(new AiTankController(ai, aiMoves));
+            controllers.add(new AiTankController(ai, random));
         }
 
         GameRenderer gameRenderer = new GameRenderer(LEVEL_MAP);
