@@ -92,11 +92,6 @@ public final class Bullet implements Movable {
     }
 
     @Override
-    public <R> R accept(GameObjectVisitor<R> visitor) {
-        return visitor.visitBullet(this);
-    }
-
-    @Override
     public GridPoint2 getCoordinates() {
         return coordinates;
     }

@@ -10,7 +10,6 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Interpolation;
 import ru.mipt.bit.platformer.level.LevelListener;
-import ru.mipt.bit.platformer.model.Bullet;
 import ru.mipt.bit.platformer.model.GameObject;
 import ru.mipt.bit.platformer.model.GameObjectVisitor;
 import ru.mipt.bit.platformer.model.Movable;
@@ -30,9 +29,6 @@ public class GameRenderer implements Renderer, LevelListener {
     private static final float BACKGROUND_GREEN = 0f;
     private static final float BACKGROUND_BLUE = 0.2f;
     private static final float BACKGROUND_ALPHA = 1f;
-    private static final String TANK_TEXTURE = "images/tank_blue.png";
-    private static final String TREE_TEXTURE = "images/greenTree.png";
-    private static final String BULLET_TEXTURE = "images/bullet.png";
 
     private final Batch batch;
     private final TiledMap level;
@@ -40,6 +36,7 @@ public class GameRenderer implements Renderer, LevelListener {
     private final TiledMapTileLayer groundLayer;
     private final TileMovement tileMovement;
     private final Map<String, Texture> textures = new HashMap<String, Texture>();
+    private final Map<Class<?>, String> texturePaths = new HashMap<Class<?>, String>();
     private final Map<GameObject, EntityGraphic> shown = new HashMap<GameObject, EntityGraphic>();
     private final List<EntityGraphic> graphics = new ArrayList<EntityGraphic>();
 
@@ -66,23 +63,32 @@ public class GameRenderer implements Renderer, LevelListener {
         }
     }
 
+    public void registerTexture(Class<? extends GameObject> type, String texturePath) {
+        texturePaths.put(type, texturePath);
+    }
+
     private EntityGraphic createEntityGraphic(GameObject object) {
         return object.accept(new GameObjectVisitor<EntityGraphic>() {
             @Override
             public EntityGraphic visitGameObject(GameObject object) {
-                return new ObstacleGraphic(object, createGraphic(TREE_TEXTURE), groundLayer);
+                return new ObstacleGraphic(object, createGraphic(texturePath(object)), groundLayer);
             }
 
             @Override
             public EntityGraphic visitMovable(Movable movable) {
-                return new MovableGraphic(movable, createGraphic(TANK_TEXTURE), tileMovement);
-            }
-
-            @Override
-            public EntityGraphic visitBullet(Bullet bullet) {
-                return new MovableGraphic(bullet, createGraphic(BULLET_TEXTURE), tileMovement);
+                return new MovableGraphic(movable, createGraphic(texturePath(movable)), tileMovement);
             }
         });
+    }
+
+    private String texturePath(GameObject object) {
+        for (Class<?> type = object.getClass(); type != null; type = type.getSuperclass()) {
+            String path = texturePaths.get(type);
+            if (path != null) {
+                return path;
+            }
+        }
+        throw new IllegalArgumentException("No texture registered for " + object.getClass().getName());
     }
 
     private GraphicObject createGraphic(String texturePath) {

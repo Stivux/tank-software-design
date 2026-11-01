@@ -12,11 +12,13 @@ import ru.mipt.bit.platformer.level.LevelGenerator;
 import ru.mipt.bit.platformer.level.RandomLevelGenerator;
 import ru.mipt.bit.platformer.level.RandomTankGenerator;
 import ru.mipt.bit.platformer.level.TextLevelGenerator;
+import ru.mipt.bit.platformer.model.Bullet;
 import ru.mipt.bit.platformer.model.CollisionDetector;
 import ru.mipt.bit.platformer.model.GameObject;
 import ru.mipt.bit.platformer.model.MovementCollisionDetector;
 import ru.mipt.bit.platformer.model.ObstacleCollisionDetector;
 import ru.mipt.bit.platformer.model.Tank;
+import ru.mipt.bit.platformer.model.Tree;
 import ru.mipt.bit.platformer.model.Updatable;
 import ru.mipt.bit.platformer.renderer.GameRenderer;
 
@@ -39,6 +41,9 @@ public final class GameSetup {
     private static final boolean USE_FILE_LEVEL = true;
     private static final String LEVEL_MAP = "level.tmx";
     private static final String LEVEL_GRID = "level.txt";
+    private static final String TANK_TEXTURE = "images/tank_blue.png";
+    private static final String TREE_TEXTURE = "images/greenTree.png";
+    private static final String BULLET_TEXTURE = "images/bullet.png";
 
     private GameSetup() {
     }
@@ -68,6 +73,9 @@ public final class GameSetup {
         }
 
         GameRenderer gameRenderer = new GameRenderer(LEVEL_MAP);
+        gameRenderer.registerTexture(Tank.class, TANK_TEXTURE);
+        gameRenderer.registerTexture(Bullet.class, BULLET_TEXTURE);
+        gameRenderer.registerTexture(Tree.class, TREE_TEXTURE);
         level.addListener(gameRenderer);
         for (GameObject obstacle : level.getObstacles()) {
             level.add(obstacle);

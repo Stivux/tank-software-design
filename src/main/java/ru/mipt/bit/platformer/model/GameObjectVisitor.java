@@ -6,8 +6,4 @@ public interface GameObjectVisitor<R> {
     default R visitMovable(Movable movable) {
         return visitGameObject(movable);
     }
-
-    default R visitBullet(Bullet bullet) {
-        return visitMovable(bullet);
-    }
 }
