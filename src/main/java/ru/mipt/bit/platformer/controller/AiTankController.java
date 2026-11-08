@@ -1,15 +1,15 @@
 package ru.mipt.bit.platformer.controller;
 
 import ru.mipt.bit.platformer.model.Direction;
-import ru.mipt.bit.platformer.model.Movable;
+import ru.mipt.bit.platformer.model.Tank;
 
 import java.util.Random;
 
 public final class AiTankController implements Controller {
-    private final Movable tank;
+    private final Tank tank;
     private final Random random;
 
-    public AiTankController(Movable tank, Random random) {
+    public AiTankController(Tank tank, Random random) {
         this.tank = tank;
         this.random = random;
     }
@@ -17,6 +17,11 @@ public final class AiTankController implements Controller {
     @Override
     public void update() {
         Direction[] directions = Direction.values();
-        new MoveTankAction(tank, directions[random.nextInt(directions.length)]).execute();
+        int choice = random.nextInt(directions.length + 1);
+        if (choice < directions.length) {
+            new MoveTankAction(tank, directions[choice]).execute();
+        } else {
+            new ShootTankAction(tank).execute();
+        }
     }
 }

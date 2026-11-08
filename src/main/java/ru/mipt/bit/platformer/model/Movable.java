@@ -10,4 +10,19 @@ public interface Movable extends GameObject {
     float getMovementProgress();
 
     float getRotation();
+
+    @Override
+    default boolean occupies(GridPoint2 cell) {
+        return getCoordinates().equals(cell) || getDestinationCoordinates().equals(cell);
+    }
+
+    @Override
+    default boolean blocksMovement() {
+        return true;
+    }
+
+    @Override
+    default <R> R accept(GameObjectVisitor<R> visitor) {
+        return visitor.visitMovable(this);
+    }
 }

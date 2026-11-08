@@ -9,6 +9,10 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Interpolation;
+import ru.mipt.bit.platformer.level.LevelListener;
+import ru.mipt.bit.platformer.model.GameObject;
+import ru.mipt.bit.platformer.model.GameObjectVisitor;
+import ru.mipt.bit.platformer.model.Movable;
 import ru.mipt.bit.platformer.util.TileMovement;
 
 import java.util.ArrayList;
@@ -20,7 +24,7 @@ import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.createSingleLayerMapRenderer;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.getSingleLayer;
 
-public class GameRenderer implements Renderer {
+public class GameRenderer implements Renderer, LevelListener {
     private static final float BACKGROUND_RED = 0f;
     private static final float BACKGROUND_GREEN = 0f;
     private static final float BACKGROUND_BLUE = 0.2f;
@@ -32,6 +36,8 @@ public class GameRenderer implements Renderer {
     private final TiledMapTileLayer groundLayer;
     private final TileMovement tileMovement;
     private final Map<String, Texture> textures = new HashMap<String, Texture>();
+    private final Map<Class<?>, String> texturePaths = new HashMap<Class<?>, String>();
+    private final Map<GameObject, EntityGraphic> shown = new HashMap<GameObject, EntityGraphic>();
     private final List<EntityGraphic> graphics = new ArrayList<EntityGraphic>();
 
     public GameRenderer(String levelPath) {
@@ -42,20 +48,51 @@ public class GameRenderer implements Renderer {
         tileMovement = new TileMovement(groundLayer, Interpolation.smooth);
     }
 
-    public void add(EntityGraphic graphic) {
+    @Override
+    public void onAdded(GameObject object) {
+        EntityGraphic graphic = createEntityGraphic(object);
+        shown.put(object, graphic);
         graphics.add(graphic);
     }
 
-    public GraphicObject createGraphic(String texturePath) {
+    @Override
+    public void onRemoved(GameObject object) {
+        EntityGraphic graphic = shown.remove(object);
+        if (graphic != null) {
+            graphics.remove(graphic);
+        }
+    }
+
+    public void registerTexture(Class<? extends GameObject> type, String texturePath) {
+        texturePaths.put(type, texturePath);
+    }
+
+    private EntityGraphic createEntityGraphic(GameObject object) {
+        return object.accept(new GameObjectVisitor<EntityGraphic>() {
+            @Override
+            public EntityGraphic visitGameObject(GameObject object) {
+                return new ObstacleGraphic(object, createGraphic(texturePath(object)), groundLayer);
+            }
+
+            @Override
+            public EntityGraphic visitMovable(Movable movable) {
+                return new MovableGraphic(movable, createGraphic(texturePath(movable)), tileMovement);
+            }
+        });
+    }
+
+    private String texturePath(GameObject object) {
+        for (Class<?> type = object.getClass(); type != null; type = type.getSuperclass()) {
+            String path = texturePaths.get(type);
+            if (path != null) {
+                return path;
+            }
+        }
+        throw new IllegalArgumentException("No texture registered for " + object.getClass().getName());
+    }
+
+    private GraphicObject createGraphic(String texturePath) {
         return new GraphicObject(texture(texturePath));
-    }
-
-    public TileMovement getTileMovement() {
-        return tileMovement;
-    }
-
-    public TiledMapTileLayer getGroundLayer() {
-        return groundLayer;
     }
 
     @Override

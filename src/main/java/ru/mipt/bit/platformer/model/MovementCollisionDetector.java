@@ -8,14 +8,14 @@ public final class MovementCollisionDetector implements CollisionDetector {
     private final int width;
     private final int height;
     private final CollisionDetector obstacles;
-    private final Collection<? extends Movable> tanks;
+    private final Collection<? extends GameObject> objects;
 
     public MovementCollisionDetector(int width, int height, CollisionDetector obstacles,
-                                     Collection<? extends Movable> tanks) {
+                                     Collection<? extends GameObject> objects) {
         this.width = width;
         this.height = height;
         this.obstacles = obstacles;
-        this.tanks = tanks;
+        this.objects = objects;
     }
 
     @Override
@@ -26,8 +26,8 @@ public final class MovementCollisionDetector implements CollisionDetector {
         if (obstacles.isOccupied(position)) {
             return true;
         }
-        for (Movable tank : tanks) {
-            if (tank.getCoordinates().equals(position) || tank.getDestinationCoordinates().equals(position)) {
+        for (GameObject object : objects) {
+            if (object.blocksMovement() && object.occupies(position)) {
                 return true;
             }
         }
