@@ -21,6 +21,7 @@ import ru.mipt.bit.platformer.model.Tank;
 import ru.mipt.bit.platformer.model.Tree;
 import ru.mipt.bit.platformer.model.Updatable;
 import ru.mipt.bit.platformer.renderer.GameRenderer;
+import ru.mipt.bit.platformer.renderer.HealthBarVisibility;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -58,9 +59,11 @@ public final class GameSetup {
         Random random = new Random();
 
         Tank player = new Tank(level.getPlayerStart(), MOVEMENT_SPEED, collisions, level);
+        HealthBarVisibility healthBars = new HealthBarVisibility();
         KeyboardHandler keyboard = new KeyboardHandler(new GdxKeyInput(Gdx.input));
         TankControls.bindMovement(keyboard, player);
         TankControls.bindShooting(keyboard, player);
+        TankControls.bindHealthBars(keyboard, healthBars);
 
         List<Controller> controllers = new ArrayList<Controller>();
         controllers.add(keyboard);
@@ -72,7 +75,7 @@ public final class GameSetup {
             controllers.add(new AiTankController(ai, random));
         }
 
-        GameRenderer gameRenderer = new GameRenderer(LEVEL_MAP);
+        GameRenderer gameRenderer = new GameRenderer(LEVEL_MAP, healthBars);
         gameRenderer.registerTexture(Tank.class, TANK_TEXTURE);
         gameRenderer.registerTexture(Bullet.class, BULLET_TEXTURE);
         gameRenderer.registerTexture(Tree.class, TREE_TEXTURE);

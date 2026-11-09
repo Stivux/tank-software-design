@@ -93,12 +93,12 @@ public final class Bullet implements Movable {
 
     @Override
     public GridPoint2 getCoordinates() {
-        return coordinates;
+        return coordinates.cpy();
     }
 
     @Override
     public GridPoint2 getDestinationCoordinates() {
-        return destination;
+        return destination.cpy();
     }
 
     @Override

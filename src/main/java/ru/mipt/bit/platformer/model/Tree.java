@@ -11,7 +11,7 @@ public class Tree implements GameObject {
 
     @Override
     public GridPoint2 getCoordinates() {
-        return coordinates;
+        return coordinates.cpy();
     }
 
     @Override

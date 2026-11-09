@@ -54,6 +54,24 @@ class KeyboardHandlerTest {
         assertEquals(List.of("up", "shoot"), calls);
     }
 
+    @Test
+    void toggleHandlerRunsOnceWhileKeyIsHeld() {
+        FakeKeyInput input = new FakeKeyInput();
+        KeyboardHandler keyboard = new KeyboardHandler(input);
+        List<String> calls = new ArrayList<String>();
+        keyboard.addToggleHandler(record(calls, "toggle"), 3);
+
+        input.press(3);
+        keyboard.update();
+        keyboard.update();
+        input.release(3);
+        keyboard.update();
+        input.press(3);
+        keyboard.update();
+
+        assertEquals(List.of("toggle", "toggle"), calls);
+    }
+
     private static Action record(final List<String> calls, final String name) {
         return new Action() {
             @Override

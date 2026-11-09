@@ -1,6 +1,8 @@
 package ru.mipt.bit.platformer.renderer;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -13,6 +15,7 @@ import ru.mipt.bit.platformer.level.LevelListener;
 import ru.mipt.bit.platformer.model.GameObject;
 import ru.mipt.bit.platformer.model.GameObjectVisitor;
 import ru.mipt.bit.platformer.model.Movable;
+import ru.mipt.bit.platformer.model.Tank;
 import ru.mipt.bit.platformer.util.TileMovement;
 
 import java.util.ArrayList;
@@ -39,8 +42,11 @@ public class GameRenderer implements Renderer, LevelListener {
     private final Map<Class<?>, String> texturePaths = new HashMap<Class<?>, String>();
     private final Map<GameObject, EntityGraphic> shown = new HashMap<GameObject, EntityGraphic>();
     private final List<EntityGraphic> graphics = new ArrayList<EntityGraphic>();
+    private final HealthBarVisibility healthBars;
+    private final Texture healthBarPixel = createWhitePixel();
 
-    public GameRenderer(String levelPath) {
+    public GameRenderer(String levelPath, HealthBarVisibility healthBars) {
+        this.healthBars = healthBars;
         batch = new SpriteBatch();
         level = new TmxMapLoader().load(levelPath);
         levelRenderer = createSingleLayerMapRenderer(level, batch);
@@ -76,7 +82,12 @@ public class GameRenderer implements Renderer, LevelListener {
 
             @Override
             public EntityGraphic visitMovable(Movable movable) {
-                return new MovableGraphic(movable, createGraphic(texturePath(movable)), tileMovement);
+                GraphicObject graphic = createGraphic(texturePath(movable));
+                EntityGraphic entity = new MovableGraphic(movable, graphic, tileMovement);
+                if (movable instanceof Tank) {
+                    entity = new HealthBarGraphic(entity, graphic, (Tank) movable, healthBars, healthBarPixel);
+                }
+                return entity;
             }
         });
     }
@@ -114,8 +125,18 @@ public class GameRenderer implements Renderer, LevelListener {
         for (Texture texture : textures.values()) {
             texture.dispose();
         }
+        healthBarPixel.dispose();
         level.dispose();
         batch.dispose();
+    }
+
+    private static Texture createWhitePixel() {
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(Color.WHITE);
+        pixmap.fill();
+        Texture texture = new Texture(pixmap);
+        pixmap.dispose();
+        return texture;
     }
 
     private Texture texture(String path) {

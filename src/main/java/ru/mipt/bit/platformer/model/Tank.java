@@ -5,8 +5,8 @@ import com.badlogic.gdx.math.GridPoint2;
 import static com.badlogic.gdx.math.MathUtils.isEqual;
 
 public class Tank implements Movable {
-    private static final int DEFAULT_HEALTH = 1;
-    private static final int BULLET_DAMAGE = 1;
+    private static final int DEFAULT_HEALTH = 100;
+    private static final int BULLET_DAMAGE = 20;
     private static final float BULLET_SPEED = 0.2f;
     private static final float SHOOT_COOLDOWN = 0.4f;
 
@@ -84,6 +84,10 @@ public class Tank implements Movable {
         return health;
     }
 
+    public int getMaxHealth() {
+        return DEFAULT_HEALTH;
+    }
+
     @Override
     public void update(float deltaTime) {
         movementProgress = advanceProgress(movementProgress, deltaTime, movementSpeed);
@@ -115,12 +119,12 @@ public class Tank implements Movable {
 
     @Override
     public GridPoint2 getCoordinates() {
-        return coordinates;
+        return coordinates.cpy();
     }
 
     @Override
     public GridPoint2 getDestinationCoordinates() {
-        return destinationCoordinates;
+        return destinationCoordinates.cpy();
     }
 
     @Override

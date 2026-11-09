@@ -13,25 +13,39 @@ public class KeyboardHandler implements Controller, KeyBindings {
 
     @Override
     public void addHandler(Action action, int... keys) {
-        bindings.add(new KeyBinding(action, keys));
+        bindings.add(new KeyBinding(action, false, keys));
+    }
+
+    @Override
+    public void addToggleHandler(Action action, int... keys) {
+        bindings.add(new KeyBinding(action, true, keys));
     }
 
     @Override
     public void update() {
         for (KeyBinding binding : bindings) {
-            if (binding.isPressed(input)) {
-                binding.execute();
-            }
+            binding.update(input);
         }
     }
 
     private static final class KeyBinding {
         private final Action action;
+        private final boolean onPressOnly;
         private final int[] keys;
+        private boolean wasPressed;
 
-        private KeyBinding(Action action, int[] keys) {
+        private KeyBinding(Action action, boolean onPressOnly, int[] keys) {
             this.action = action;
+            this.onPressOnly = onPressOnly;
             this.keys = keys.clone();
+        }
+
+        private void update(KeyInput input) {
+            boolean pressed = isPressed(input);
+            if (pressed && (!onPressOnly || !wasPressed)) {
+                action.execute();
+            }
+            wasPressed = pressed;
         }
 
         private boolean isPressed(KeyInput input) {
@@ -41,10 +55,6 @@ public class KeyboardHandler implements Controller, KeyBindings {
                 }
             }
             return false;
-        }
-
-        private void execute() {
-            action.execute();
         }
     }
 }

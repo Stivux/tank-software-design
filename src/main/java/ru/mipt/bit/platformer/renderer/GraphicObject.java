@@ -21,6 +21,10 @@ public class GraphicObject {
         this.rectangle = createBoundingRectangle(region);
     }
 
+    public Rectangle getRectangle() {
+        return rectangle;
+    }
+
     public void draw(Batch batch, float rotation) {
         drawTextureRegionUnscaled(batch, region, rectangle, rotation);
     }
