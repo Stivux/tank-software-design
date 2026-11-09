@@ -119,12 +119,12 @@ public class Tank implements Movable {
 
     @Override
     public GridPoint2 getCoordinates() {
-        return coordinates;
+        return coordinates.cpy();
     }
 
     @Override
     public GridPoint2 getDestinationCoordinates() {
-        return destinationCoordinates;
+        return destinationCoordinates.cpy();
     }
 
     @Override
