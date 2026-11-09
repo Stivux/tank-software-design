@@ -21,6 +21,12 @@ class TankTest {
     }
 
     @Test
+    void startsWithFullHealth() {
+        assertEquals(100, tank.getHealth());
+        assertEquals(100, tank.getMaxHealth());
+    }
+
+    @Test
     void startsAtGivenCellFacingRight() {
         assertEquals(new GridPoint2(1, 1), tank.getCoordinates());
         assertEquals(new GridPoint2(1, 1), tank.getDestinationCoordinates());

@@ -3,10 +3,12 @@ package ru.mipt.bit.platformer.controller;
 import ru.mipt.bit.platformer.model.Direction;
 import ru.mipt.bit.platformer.model.Movable;
 import ru.mipt.bit.platformer.model.Tank;
+import ru.mipt.bit.platformer.renderer.HealthBarVisibility;
 
 import static com.badlogic.gdx.Input.Keys.A;
 import static com.badlogic.gdx.Input.Keys.D;
 import static com.badlogic.gdx.Input.Keys.DOWN;
+import static com.badlogic.gdx.Input.Keys.L;
 import static com.badlogic.gdx.Input.Keys.LEFT;
 import static com.badlogic.gdx.Input.Keys.RIGHT;
 import static com.badlogic.gdx.Input.Keys.S;
@@ -27,5 +29,9 @@ public final class TankControls {
 
     public static void bindShooting(KeyBindings bindings, Tank tank) {
         bindings.addHandler(new ShootTankAction(tank), SPACE);
+    }
+
+    public static void bindHealthBars(KeyBindings bindings, HealthBarVisibility visibility) {
+        bindings.addToggleHandler(new ToggleHealthBarsAction(visibility), L);
     }
 }
