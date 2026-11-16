@@ -6,7 +6,7 @@ import static com.badlogic.gdx.math.MathUtils.isEqual;
 
 public class Tank implements Movable {
     private static final int DEFAULT_HEALTH = 100;
-    private static final int BULLET_DAMAGE = 20;
+    private static final int BULLET_DAMAGE = 10;
     private static final float BULLET_SPEED = 0.2f;
     private static final float SHOOT_COOLDOWN = 0.4f;
 
@@ -16,10 +16,12 @@ public class Tank implements Movable {
     private final CollisionDetector collisionDetector;
     private final World world;
     private final int bulletDamage;
+    private final int initialHealth;
     private float movementProgress = 1f;
     private float shootCooldown;
     private Direction facing = Direction.RIGHT;
     private int health;
+    private TankState state;
 
     public Tank(GridPoint2 startCoordinates, float movementSpeed, CollisionDetector collisionDetector) {
         this(startCoordinates, movementSpeed, collisionDetector, null, DEFAULT_HEALTH, BULLET_DAMAGE);
@@ -36,8 +38,10 @@ public class Tank implements Movable {
         this.movementSpeed = movementSpeed;
         this.collisionDetector = collisionDetector;
         this.world = world;
+        this.initialHealth = health;
         this.health = health;
         this.bulletDamage = bulletDamage;
+        this.state = HealthStates.of(health, initialHealth);
     }
 
     @Override
@@ -54,7 +58,7 @@ public class Tank implements Movable {
     }
 
     public void shoot() {
-        if (world == null || health <= 0 || shootCooldown > 0f) {
+        if (world == null || health <= 0 || !state.canShoot() || shootCooldown > 0f) {
             return;
         }
         if (!hasReachedDestination()) {
@@ -64,12 +68,17 @@ public class Tank implements Movable {
         if (!world.inBounds(cell)) {
             return;
         }
-        shootCooldown = SHOOT_COOLDOWN;
+        shootCooldown = SHOOT_COOLDOWN * state.shootIntervalFactor();
         world.add(new Bullet(cell, facing, BULLET_SPEED, bulletDamage, world));
     }
 
     public void takeDamage(int amount) {
         health -= amount;
+        state = state.afterHealthChange(health, initialHealth);
+    }
+
+    public void setState(TankState state) {
+        this.state = state;
     }
 
     @Override
@@ -85,12 +94,17 @@ public class Tank implements Movable {
     }
 
     public int getMaxHealth() {
-        return DEFAULT_HEALTH;
+        return initialHealth;
+    }
+
+    public TankState getState() {
+        return state;
     }
 
     @Override
     public void update(float deltaTime) {
-        movementProgress = advanceProgress(movementProgress, deltaTime, movementSpeed);
+        float travelTime = movementSpeed * state.cellTravelTimeFactor();
+        movementProgress = advanceProgress(movementProgress, deltaTime, travelTime);
         if (hasReachedDestination()) {
             coordinates.set(destinationCoordinates);
         }
