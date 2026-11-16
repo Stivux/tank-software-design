@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import ru.mipt.bit.platformer.model.GameObject;
 
+/** Adapter from a stationary object to a sprite. */
 public class ObstacleGraphic implements EntityGraphic {
     private final GraphicObject graphics;
 

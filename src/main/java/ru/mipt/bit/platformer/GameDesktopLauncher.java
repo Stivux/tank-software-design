@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
+/** Adapter from the LibGDX window to {@link GameLoop}. */
 public class GameDesktopLauncher implements ApplicationListener {
     private static final int TILE_SIZE = 128;
 

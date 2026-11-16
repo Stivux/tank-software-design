@@ -2,6 +2,7 @@ package ru.mipt.bit.platformer.controller;
 
 import com.badlogic.gdx.Input;
 
+/** Adapter from LibGDX {@link com.badlogic.gdx.Input} to {@link KeyInput}. */
 public class GdxKeyInput implements KeyInput {
     private final Input input;
 

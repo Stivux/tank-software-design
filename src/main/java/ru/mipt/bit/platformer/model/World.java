@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.GridPoint2;
 
 import java.util.List;
 
+/** Port for the world: objects and bounds. */
 public interface World {
     void add(GameObject object);
 

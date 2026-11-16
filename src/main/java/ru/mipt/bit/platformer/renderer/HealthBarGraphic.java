@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Rectangle;
 import ru.mipt.bit.platformer.model.Tank;
 
+/** Adapter that draws a health bar over another sprite. */
 public class HealthBarGraphic implements EntityGraphic {
     private static final float BAR_WIDTH = 80f;
     private static final float BAR_HEIGHT = 12f;

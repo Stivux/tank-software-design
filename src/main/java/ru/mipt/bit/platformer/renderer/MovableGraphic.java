@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import ru.mipt.bit.platformer.model.Movable;
 import ru.mipt.bit.platformer.util.TileMovement;
 
+/** Adapter from a moving object to a sprite. */
 public class MovableGraphic implements EntityGraphic {
     private final Movable movable;
     private final GraphicObject graphics;

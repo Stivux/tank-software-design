@@ -5,6 +5,7 @@ import ru.mipt.bit.platformer.model.Tank;
 
 import java.util.Random;
 
+/** Adapter from random AI moves to {@link Controller}. */
 public final class AiTankController implements Controller {
     private final Tank tank;
     private final Random random;

@@ -27,6 +27,7 @@ import static com.badlogic.gdx.graphics.GL20.GL_COLOR_BUFFER_BIT;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.createSingleLayerMapRenderer;
 import static ru.mipt.bit.platformer.util.GdxGameUtils.getSingleLayer;
 
+/** LibGDX adapter for {@link Renderer} and {@link LevelListener}. */
 public class GameRenderer implements Renderer, LevelListener {
     private static final float BACKGROUND_RED = 0f;
     private static final float BACKGROUND_GREEN = 0f;
