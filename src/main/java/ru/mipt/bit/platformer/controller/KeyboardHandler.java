@@ -3,6 +3,7 @@ package ru.mipt.bit.platformer.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Keyboard adapter for {@link Controller} and {@link KeyBindings}. */
 public class KeyboardHandler implements Controller, KeyBindings {
     private final KeyInput input;
     private final List<KeyBinding> bindings = new ArrayList<KeyBinding>();

@@ -7,6 +7,7 @@ import ru.mipt.bit.platformer.model.Tree;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Adapter that builds a level from a text grid. */
 public final class TextLevelGenerator implements LevelGenerator {
     private static final char TREE = 'T';
     private static final char PLAYER = 'X';

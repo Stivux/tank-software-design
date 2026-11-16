@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/** Adapter for {@link World}: the level kept in memory. */
 public final class Level implements World, Updatable {
     private final int width;
     private final int height;

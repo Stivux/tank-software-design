@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.GridPoint2;
 
 import java.util.Collection;
 
+/** Adapter that treats obstacles as occupied cells. */
 public class ObstacleCollisionDetector implements CollisionDetector {
     private final Collection<? extends GameObject> objects;
 

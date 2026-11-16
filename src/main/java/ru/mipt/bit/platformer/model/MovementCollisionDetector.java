@@ -4,6 +4,7 @@ import com.badlogic.gdx.math.GridPoint2;
 
 import java.util.Collection;
 
+/** Adapter for occupied cells: map edge, obstacles, and tanks. */
 public final class MovementCollisionDetector implements CollisionDetector {
     private final int width;
     private final int height;

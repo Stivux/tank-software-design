@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+/** Adapter that places obstacles at random. */
 public final class RandomLevelGenerator implements LevelGenerator {
     private final int width;
     private final int height;
